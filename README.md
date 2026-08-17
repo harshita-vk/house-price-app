@@ -131,15 +131,17 @@ The trained model is not committed to this repo (it's ~140MB — see
 deploy build step in production.
 
 ## Application architecture
-backend/
-├── app/
-│ ├── ml_pipeline.py # ClusterSimilarity transformer (shared by train + serve)
-│ ├── main.py # FastAPI app, exposes POST /predict
-│ └── model/ # trained .pkl lands here after training
-├── train_model.py # training entry point (see ML Training above)
-└── requirements.txt
-frontend/
-└── index.html # static form, calls the backend directly
+
+**backend/**
+- `app/`
+  - `ml_pipeline.py` — `ClusterSimilarity` transformer (shared by train + serve)
+  - `main.py` — FastAPI app, exposes `POST /predict`
+  - `model/` — trained `.pkl` lands here after training
+- `train_model.py` — training entry point (see ML Training above)
+- `requirements.txt`
+
+**frontend/**
+- `index.html` — static form, calls the backend directly
 
 `ml_pipeline.py` exists as its own module specifically so the custom
 `ClusterSimilarity` class is importable from the same path both when the
