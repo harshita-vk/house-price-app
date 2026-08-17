@@ -1,19 +1,4 @@
-"""
-Shared ML pipeline building blocks.
 
-IMPORTANT: `ClusterSimilarity` is a custom transformer used inside the
-scikit-learn Pipeline that gets pickled with joblib. Pickle stores a
-REFERENCE to the class's import path (e.g. "app.ml_pipeline.ClusterSimilarity"),
-not the class's code itself. That means:
-
-  - This exact file/class must exist at the SAME import path both when
-    you TRAIN + SAVE the model, and when you LOAD it later to serve
-    predictions.
-  - If you trained the model in Colab (where the class lived in the
-    notebook's __main__ namespace), the old .pkl will NOT load here.
-    Use train_model.py in this project to retrain and save a fresh
-    .pkl that references THIS file instead.
-"""
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
