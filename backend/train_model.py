@@ -1,15 +1,4 @@
-"""
-Run this once to train the model and save it where main.py expects it:
-    backend/app/model/house_price_calculator_ml.pkl
 
-This is your original notebook's training logic, unchanged in substance,
-except ClusterSimilarity is now imported from app.ml_pipeline instead of
-being defined inline. That's what makes the resulting .pkl loadable by
-the FastAPI server later.
-
-Usage (from the backend/ folder):
-    python train_model.py
-"""
 from pathlib import Path
 import tarfile
 import urllib.request
