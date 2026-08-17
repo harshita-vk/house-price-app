@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bay Area Housing Estimator</title>
+<style>
+  :root {
+    --fog: #eef2f0;
+    --ink: #1c2b2a;
+    --redwood: #6b4a3a;
+    --bay: #2f6f6a;
+    --gold: #c98a3f;
+    --line: #d8ded9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--fog);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  header {
+    padding: 48px 24px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 {
+    font-size: 2.1rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #556;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--redwood);
+  }
+  input, select {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: #fcfcfb;
+    color: var(--ink);
+  }
+  input:focus, select:focus {
+    outline: 2px solid var(--bay);
+    outline-offset: 1px;
+  }
+  button {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    padding: 14px;
+    background: var(--bay);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button:hover { background: #255a56; }
+  button:disabled { background: #9bb; cursor: not-allowed; }
+
+  #result {
+    margin-top: 28px;
+    padding: 24px 28px;
+    border-radius: 4px;
+    display: none;
+  }
+  #result.show { display: block; }
+  #result.ok {
+    background: #fff8ec;
+    border: 1px solid var(--gold);
+  }
+  #result.error {
+    background: #fdf0ee;
+    border: 1px solid #c0503f;
+    color: #8a2f22;
+  }
+  #result .label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--redwood);
+    margin-bottom: 4px;
+  }
+  #result .value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  footer {
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.8rem;
+    color: #889;
+    padding: 0 24px 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Bay Area Housing Estimator</h1>
+  <p>Enter district-level census figures to get a predicted median house value</p>
+</header>
+
+<main>
+  <form id="predict-form">
+    <div class="field">
+      <label for="latitude">Latitude</label>
+      <input type="number" step="any" id="latitude" required placeholder="37.80" />
+    </div>
+    <div class="field">
+      <label for="longitude">Longitude</label>
+      <input type="number" step="any" id="longitude" required placeholder="-122.27" />
+    </div>
+
+    <div class="field">
+      <label for="housing_median_age">Median house age (yrs)</label>
+      <input type="number" step="any" id="housing_median_age" required placeholder="25" />
+    </div>
+    <div class="field">
+      <label for="median_income">Median income ($10,000s)</label>
+      <input type="number" step="any" id="median_income" required placeholder="4.5" />
+    </div>
+
+    <div class="field">
+      <label for="total_rooms">Total rooms (district)</label>
+      <input type="number" step="any" id="total_rooms" required placeholder="1200" />
+    </div>
+    <div class="field">
+      <label for="total_bedrooms">Total bedrooms (district)</label>
+      <input type="number" step="any" id="total_bedrooms" required placeholder="250" />
+    </div>
+
+    <div class="field">
+      <label for="population">Population (district)</label>
+      <input type="number" step="any" id="population" required placeholder="900" />
+    </div>
+    <div class="field">
+      <label for="households">Households (district)</label>
+      <input type="number" step="any" id="households" required placeholder="300" />
+    </div>
+
+    <div class="field full">
+      <label for="ocean_proximity">Ocean proximity</label>
+      <select id="ocean_proximity" required>
+        <option value="NEAR BAY">Near Bay</option>
+        <option value="<1H OCEAN">Less than 1 hour from ocean</option>
+        <option value="NEAR OCEAN">Near ocean</option>
+        <option value="INLAND">Inland</option>
+        <option value="ISLAND">Island</option>
+      </select>
+    </div>
+
+    <button type="submit" id="submit-btn">Estimate price</button>
+  </form>
+
+  <div id="result"></div>
+</main>
+
+<footer>
+  Calls a local FastAPI backend at <code>http://localhost:8000/predict</code>
+</footer>
+
+<script>
+  const API_URL = "http://localhost:8000/predict";
+  const form = document.getElementById("predict-form");
+  const resultBox = document.getElementById("result");
+  const submitBtn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      latitude: parseFloat(document.getElementById("latitude").value),
+      longitude: parseFloat(document.getElementById("longitude").value),
+      housing_median_age: parseFloat(document.getElementById("housing_median_age").value),
+      total_rooms: parseFloat(document.getElementById("total_rooms").value),
+      total_bedrooms: parseFloat(document.getElementById("total_bedrooms").value),
+      population: parseFloat(document.getElementById("population").value),
+      households: parseFloat(document.getElementById("households").value),
+      median_income: parseFloat(document.getElementById("median_income").value),
+      ocean_proximity: document.getElementById("ocean_proximity").value,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Estimating…";
+    resultBox.className = "";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.detail || `Request failed (${res.status})`);
+      }
+
+      const data = await res.json();
+      const formatted = data.predicted_price.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      });
+
+      resultBox.innerHTML = `
+        <div class="label">Predicted median house value</div>
+        <div class="value">${formatted}</div>
+      `;
+      resultBox.className = "show ok";
+    } catch (err) {
+      resultBox.innerHTML = `
+        <div class="label">Something went wrong</div>
+        <div>${err.message}. Is the backend running at ${API_URL.replace("/predict", "")}?</div>
+      `;
+      resultBox.className = "show error";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Estimate price";
+    }
+  });
+</script>
+
+</body>
+</html>
